@@ -11,7 +11,7 @@
   "styles": [],
   "packs": [],
   "languages": [],
-  "url": "https://github.com/yourname/combat-narration",
-  "manifest": "https://yourdomain.com/foundry/combat-narration/module.json",
-  "download": "https://yourdomain.com/foundry/combat-narration/combat-narration.zip"
+  "url": "https://github.com/surrealzerg/foundry-combat-narration",
+  "manifest": "https://raw.githubusercontent.com/surrealzerg/foundry-combat-narration/refs/heads/main/module.json",
+  "download": "https://raw.githubusercontent.com/surrealzerg/foundry-combat-narration/refs/heads/main/combat-narration.zip"
 }
