@@ -1,0 +1,17 @@
+{
+  "name": "combat-narration",
+  "title": "Combat Narration",
+  "description": "Plays gothic audio narration based on damage type and severity when players attack in combat.",
+  "version": "1.0.0",
+  "author": "Your Name",
+  "minimumCoreVersion": "12",
+  "compatibleCoreVersion": "13",
+  "scripts": ["narrateCombat.js"],
+  "esmodules": [],
+  "styles": [],
+  "packs": [],
+  "languages": [],
+  "url": "https://github.com/yourname/combat-narration",
+  "manifest": "https://yourdomain.com/foundry/combat-narration/module.json",
+  "download": "https://yourdomain.com/foundry/combat-narration/combat-narration.zip"
+}
