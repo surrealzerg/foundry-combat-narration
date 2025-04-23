@@ -1,0 +1,9 @@
+radiant_minor_003
+radiant_minor_004
+radiant_moderate_003
+radiant_moderate_004
+radiant_severe_003
+radiant_severe_004
+radiant_death_002
+radiant_death_003
+radiant_death_004
