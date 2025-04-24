@@ -5,6 +5,16 @@
   "scripts": [
     "narrateCombat.js"
   ],
+  "required": [
+    "midi-qol"
+  ],
+  "authors": [
+    {
+      "name": "Steven VanLandingham",
+      "url": "https://famtickets.com",
+      "discord": "Surreal1481"
+    }
+  ],
   "url": "https://github.com/surrealzerg/foundry-combat-narration",
   "manifest": "https://raw.githubusercontent.com/surrealzerg/foundry-combat-narration/main/module.json",
   "download": "https://raw.githubusercontent.com/surrealzerg/foundry-combat-narration/main/combat-narration.zip",
