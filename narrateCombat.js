@@ -1,17 +1,3 @@
-// 🪄 Cast narration: spell is being used
-Hooks.on("midi-qol.preItemRoll", async (workflow, config, options) => {
-  const item = workflow.item;
-  if (!item || item.type !== "spell") return;
-
-  console.log("🪄 spell detected");
-  const identifier = item.system?.identifier || item.name.toLowerCase().replace(/\s+/g, "-");
-  const castPath = `modules/combat-narration/sounds/${identifier}_cast.ogg`;
-
-  console.log(`🪄 [Spell Narration] Playing cast audio: ${castPath}`);
-  AudioHelper.play({ src: castPath, volume: 1.0, autoplay: true, loop: false }, true);
-});
-
-
 Hooks.on("midi-qol.RollComplete", async (workflow) => {
   console.log("🗡️ [Combat Narration] RollComplete Hook triggered!");
 
