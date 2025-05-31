@@ -151,6 +151,21 @@ for (const [formula, type] of fallbackParts) {
     if (d.damage > highest.amount) highest = { type: d.type, amount: d.damage };
   }
 
+  // 🔁 Override weaponType based on actual damage dealt
+  const actualDamageType = highest.type?.toLowerCase?.();
+  if (actualDamageType) {
+    if (elementalTypes.includes(actualDamageType)) {
+      weaponType = actualDamageType;
+    } else if (physicalTypes.includes(actualDamageType)) {
+      weaponType = actualDamageType;
+    } else {
+      // If it's not a known type, keep existing value or fallback to bludgeoning
+      weaponType = weaponType || "bludgeoning";
+    }
+    console.log(`🧬 Overriding weaponType based on damageDetail: ${weaponType}`);
+  }
+
+
   let severity = "minor";
   const totalDamage = workflow.damageTotal;
 
