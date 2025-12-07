@@ -2,7 +2,7 @@
   "title": "Combat Narration",
   "description": "Plays gothic audio narration based on damage type and severity when players attack in combat.",
   "version": "1.0.1",
-  "scripts": [
+  "esmodules": [
     "narrateCombat.js"
   ],
   "required": [
@@ -21,6 +21,6 @@
   "id": "combat-narration",
   "compatibility": {
     "minimum": "12",
-    "verified": "13"
+    "verified": "12.343"
   }
 }
