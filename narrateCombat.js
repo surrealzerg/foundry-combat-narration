@@ -296,8 +296,8 @@ for (const [formula, type] of fallbackParts) {
     severity = "death";
   } else {
     const ratio = totalDamage / preHP;
-    if (ratio > 0.7) severity = "severe";
-    else if (ratio > 0.3) severity = "moderate";
+    if (ratio > 0.3) severity = "severe";
+    else if (ratio > 0.16) severity = "moderate";
   }
 
   narrateLog(`🔥 Damage Type: ${weaponType}`);
