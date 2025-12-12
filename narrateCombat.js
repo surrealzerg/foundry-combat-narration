@@ -77,7 +77,7 @@ Hooks.on("midi-qol.RollComplete", async (workflow) => {
   narrateLog("✔ Target has coords:", NARRATION_INTERNAL_TARGET.x, NARRATION_INTERNAL_TARGET.y);
 
   // Now safe to compute distance/path
-  attacker = workflow.token;
+  const attacker = workflow.token;
   // 1. Horizontal distance along grid
   const path = [{ x: attacker.x, y: attacker.y }, { x: NARRATION_INTERNAL_TARGET.x, y: NARRATION_INTERNAL_TARGET.y }];
 
