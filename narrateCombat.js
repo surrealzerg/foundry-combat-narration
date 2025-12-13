@@ -77,7 +77,7 @@ Hooks.on("midi-qol.RollComplete", async (workflow) => {
   narrateLog("✔ Target has coords:", NARRATION_INTERNAL_TARGET.x, NARRATION_INTERNAL_TARGET.y);
 
   // Now safe to compute distance/path
-  attacker = workflow.token;
+  const attacker = workflow.token;
   // 1. Horizontal distance along grid
   const path = [{ x: attacker.x, y: attacker.y }, { x: NARRATION_INTERNAL_TARGET.x, y: NARRATION_INTERNAL_TARGET.y }];
 
@@ -94,8 +94,7 @@ Hooks.on("midi-qol.RollComplete", async (workflow) => {
   const hasAttack = workflow.attackRoll !== undefined;
 
   // Optional: Check if the item has a defined action type
-  const actionType = workflow.item.system.actionType;
-  const isAttackAction = ["mwak", "rwak", "msak", "rsak"].includes(actionType); // melee/ranged weapon/spell attack
+  const isAttackAction = workflow.activity?.type === "attack";
 
   const isSaveSpell = workflow.saveDC !== undefined;
   narrateLog(workflow);
@@ -244,9 +243,7 @@ for (const [formula, type] of fallbackParts) {
   // 🟥 MISS HANDLING
   if (hitTargets.length === 0 || (isSaveSpell && workflow.failedSaves?.size === 0)) {
     narrateLog("❌ [Combat Narration] Attack missed!");
-
-    const severity = "miss";
-    const key = `${weaponType}_miss`;
+    let key = `${weaponType}_miss`;
     let variation = "001";
 
     const basePattern = `${key}_`;
@@ -281,29 +278,69 @@ for (const [formula, type] of fallbackParts) {
 
   // ✅ HIT HANDLING
   const target = hitTargets[0];
-  const targetHP = target.actor.system.attributes.hp;
-  const preHP = targetHP.value + workflow.damageTotal;
-  const postHP = targetHP.value;
+  const targetHP = target.actor.system.attributes.hp.max;
+  narrateLog(`📌 Actor: ${actor.name}, Immunities: ${[...target.actor.system.traits.di.value]}`);
+
+  const isImmune = [...target.actor.system.traits.di.value].includes(weaponType);
+  const preHP = isImmune ? target.actor.system.attributes.hp.value: target.actor.system.attributes.hp.value + workflow.damageTotal;
+  const postHP = target.actor.system.attributes.hp.value;
+
+
 
   narrateLog(`📌 Actor: ${actor.name}, Target: ${target.name}`);
   narrateLog(`🧮 Target HP: ${preHP} → ${postHP}`);
 
   //determine severity
   let severity = "minor";
-  const totalDamage = workflow.damageTotal;
+  const totalDamage = preHP - postHP;
 
   if (postHP <= 0) {
     severity = "death";
-  } else {
-    const ratio = totalDamage / preHP;
-    if (ratio > 0.7) severity = "severe";
-    else if (ratio > 0.3) severity = "moderate";
+  } 
+  else if (totalDamage == 0){
+    severity = "not_effective";
+  }
+  else {
+    const ratio = totalDamage / targetHP;
+    if (ratio > 0.2) severity = "severe";
+    else if (ratio > 0.1) severity = "moderate";
   }
 
-  narrateLog(`🔥 Damage Type: ${weaponType}`);
-  narrateLog(`📊 Severity: ${severity}`);
+  let key = `${weaponType}_${severity}`;
 
-  const key = `${weaponType}_${severity}`;
+  //Monster specific hit handling
+  //only run if target is not immune
+
+  if(!isImmune){
+    const targetNameLower = target.name.toLowerCase();
+  
+    let monsterSpecific = null;
+
+    if (targetNameLower.includes("dragon")) {
+      monsterSpecific = `dragon_${severity}`;
+    } else if (targetNameLower.includes("air elemental")) {
+      monsterSpecific = `air_elemental_${severity}`;
+    } else if (targetNameLower.includes("earth elemental")) {
+      monsterSpecific = `earth_elemental_${severity}`;
+    } else if (targetNameLower.includes("fire elemental")) {
+      monsterSpecific = `fire_elemental_${severity}`;
+    } else if (targetNameLower.includes("water elemental")) {
+      monsterSpecific = `water_elemental_${severity}`;
+    }
+
+    if(monsterSpecific != null){
+      //even if monster specific found, only use monster specific key 50% of the time
+      if (Math.random() < .5) {
+        key = monsterSpecific;
+      }
+      else{
+        key = `${weaponType}_${severity}`;
+      }
+    }
+  }
+  
+  narrateLog(`🔥 filename key: ${key}`);
+  
   let variation = "001";
 
   const basePattern = `${key}_`;
