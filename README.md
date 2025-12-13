@@ -1,3 +1,6 @@
+Install with module.json:
+https://github.com/surrealzerg/foundry-combat-narration/releases/download/v1.1/module.json
+
 This module plays narration when damage is dealt.
 As of 12/13/2025 there are 650 dialogue lines in the library.
 
