@@ -1,12 +1,23 @@
 This module plays narration when damage is dealt.
+As of 12/13/2025 there are 650 dialogue lines in the library.
 
-There are 21 dialogue lines per damage type:
-4 minor damage
-4 moderate damage
-4 severe damage
-4 death 
-5 miss
+There are 34 dialogue lines per damage type:
+	7 minor damage
+	4 moderate damage
+	4 severe damage
+	4 death 
+	5 not effective (immune)
+	10 miss
 
-This covers the 15 damage types, resulting in 315 audio files.
+This covers the 15 damage types, resulting in 510 audio files.
 
-Play.ht with the Earle voice was used to generate all lines.
+There are also monster specific dialogue lines for the below monsters
+- Air Elemental (5 minor, 5 moderate, 5 severe, 5 death)
+- Earth Elemental (5 minor, 5 moderate, 5 severe, 5 death)
+- Fire Elemental (5 minor, 5 moderate, 5 severe, 5 death)
+- Water Elemental (5 minor, 5 moderate, 5 severe, 5 death)
+- Dragons (15 minor, 15 moderate, 15 severe, 15 death)
+
+
+Play.ht was with Earle used for the original 435 lines.
+Cartesia using a voice clone of Earle is used for all expansions.
