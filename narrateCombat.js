@@ -278,21 +278,36 @@ for (const [formula, type] of fallbackParts) {
 
   // ✅ HIT HANDLING
   const target = hitTargets[0];
-  const targetHP = target.actor.system.attributes.hp.max;
+  const targetMaxHP = target.actor.system.attributes.hp.max + target.actor.system.attributes.hp.temp;
+  const targetHP = target.actor.system.attributes.hp.value + target.actor.system.attributes.hp.temp;
   narrateLog(`📌 Actor: ${actor.name}, Immunities: ${[...target.actor.system.traits.di.value]}`);
+  narrateLog(`📌 Actor: ${actor.name}, Vulnerabilties: ${[...target.actor.system.traits.dv.value]}`);
+  narrateLog(`📌 Actor: ${actor.name}, Resistances: ${[...target.actor.system.traits.dr.value]}`);
 
   const isImmune = [...target.actor.system.traits.di.value].includes(weaponType);
-  const preHP = isImmune ? target.actor.system.attributes.hp.value: target.actor.system.attributes.hp.value + workflow.damageTotal;
-  const postHP = target.actor.system.attributes.hp.value;
+  const isVulnerable = [...target.actor.system.traits.dv.value].includes(weaponType);
+  const isResistant = [...target.actor.system.traits.dr.value].includes(weaponType);
+  let totalDamage = workflow.damageTotal;
 
+  if(isVulnerable){
+    totalDamage = workflow.damageTotal * 2;
+  }
+  else if(isResistant){
+    totalDamage = workflow.damageTotal / 2;
+  }
+  else if(isImmune){
+    totalDamage = 0;
+  }
 
+  const preHP = targetHP + totalDamage;
+  const postHP = targetHP;
 
   narrateLog(`📌 Actor: ${actor.name}, Target: ${target.name}`);
   narrateLog(`🧮 Target HP: ${preHP} → ${postHP}`);
 
   //determine severity
   let severity = "minor";
-  const totalDamage = preHP - postHP;
+  totalDamage = preHP - postHP;
 
   if (postHP <= 0) {
     severity = "death";
@@ -301,7 +316,7 @@ for (const [formula, type] of fallbackParts) {
     severity = "not_effective";
   }
   else {
-    const ratio = totalDamage / targetHP;
+    const ratio = totalDamage / targetMaxHP;
     if (ratio > 0.2) severity = "severe";
     else if (ratio > 0.1) severity = "moderate";
   }
