@@ -182,8 +182,12 @@ for (const [formula, type] of fallbackParts) {
   } 
 
   narrateLog("🎯 weaponType:", weaponType);
-
-
+  narrateLog("🎯 saveResults:", workflow.saveResults);
+  const isFearSpell = workflow.item?.effects?.some(e => e.statuses?.has("frightened")) || workflow.failedSaves?.some(t => t.actor?.statuses?.has("frightened"));
+  narrateLog("🎯 isFearSpell:", isFearSpell);
+  if(isFearSpell){
+    weaponType = "fear";
+  }
 
   // Fallback based on name
   if (!weaponType || weaponType == "piercing") {
@@ -243,9 +247,17 @@ for (const [formula, type] of fallbackParts) {
   // 🟥 MISS HANDLING
   if (hitTargets.length === 0 || (isSaveSpell && workflow.failedSaves?.size === 0)) {
     narrateLog("❌ [Combat Narration] Attack missed!");
-    let key = `${weaponType}_miss`;
+    
+    let key = null;
     let variation = "001";
-
+    //play the miss line or the fear save success line depending on if it's a fear-based spell
+    if(!isFearSpell){
+      key = `${weaponType}_miss`;
+    }
+    else{
+      key = `${weaponType}_success`;
+    }
+    
     const basePattern = `${key}_`;
     const files = await FilePicker.browse("data", folderPath);
     const matchingFiles = files.files.filter(f => {
@@ -312,6 +324,9 @@ for (const [formula, type] of fallbackParts) {
   if (postHP <= 0) {
     severity = "death";
   } 
+  else if(isFearSpell){
+    severity = "fail";
+  }
   else if (totalDamage == 0){
     severity = "not_effective";
   }
