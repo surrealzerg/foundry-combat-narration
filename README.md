@@ -2,9 +2,9 @@ Install with module.json:
 https://github.com/surrealzerg/foundry-combat-narration/releases/download/v1.1/module.json
 
 This module plays narration when damage is dealt.
-As of 12/14/2025 there are 670 dialogue lines in the library.
+As of 1/1/2026 there are 883 dialogue lines in the library.
 
-There are 34 dialogue lines per damage type:
+There are 34 dialogue lines per non-core damage type:
 	7 minor damage
 	4 moderate damage
 	4 severe damage
@@ -12,7 +12,7 @@ There are 34 dialogue lines per damage type:
 	5 not effective (immune)
 	10 miss
 
-This covers the 15 damage types, resulting in 510 audio files.
+Piercing, Slashing, and Bludgeoning have 20 minor, 20 moderate, 20 severe, 20 death, and 20 miss.
 
 There are also monster specific dialogue lines for the below monsters
 - Air Elemental (5 minor, 5 moderate, 5 severe, 5 death)
