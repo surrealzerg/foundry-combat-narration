@@ -4,6 +4,11 @@ https://github.com/surrealzerg/foundry-combat-narration/releases/download/v1.1/m
 This module plays narration when damage is dealt.
 As of 1/1/2026 there are 883 dialogue lines in the library.
 
+<video controls style="max-width: 100%; height: auto;">
+  <source src="https://github.com/surrealzerg/foundry-combat-narration/raw/refs/heads/main/combat-narration.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+
 There are 34 dialogue lines per non-core damage type:
 	7 minor damage
 	4 moderate damage
