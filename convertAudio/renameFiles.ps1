@@ -2,7 +2,7 @@
 $newNames = Get-Content -Path ".\filenames.txt"
 
 # Get all .wav files in the current folder, sorted alphabetically
-$files = Get-ChildItem -Filter *.wav | Sort-Object Name
+$files = Get-ChildItem -Filter *.ogg | Sort-Object Name
 
 # Check if count matches
 if ($files.Count -ne $newNames.Count) {
@@ -13,7 +13,7 @@ if ($files.Count -ne $newNames.Count) {
 # Rename each file
 for ($i = 0; $i -lt $files.Count; $i++) {
     $oldFile = $files[$i]
-    $newName = "$($newNames[$i]).wav"
+    $newName = "$($newNames[$i]).ogg"
     
     Write-Host "🔄 Renaming '$($oldFile.Name)' → '$newName'"
     Rename-Item -Path $oldFile.FullName -NewName $newName

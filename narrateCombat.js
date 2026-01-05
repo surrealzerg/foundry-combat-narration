@@ -27,6 +27,49 @@ function narrateWarn(...args) {
   if (!suppress) console.warn(...args);
 }
 
+async function playAudio(key) {
+  const folderPath = `modules/combat-narration/sounds/`;
+  let basePattern = `${key}_`;
+  let files = await FilePicker.browse("data", folderPath);
+
+  let matchingFiles = files.files.filter(f => {
+    let fileName = f.split("/").pop();
+    return fileName.startsWith(basePattern) && fileName.endsWith(".ogg");
+  });
+
+  narrateLog(`🎧 Found ${matchingFiles.length} files.`);
+
+  if (matchingFiles.length === 0) {
+    console.warn("⚠️ No matching hit audio files found.");
+    return;
+  }
+
+  let lastUsed = game.combatNarrationCache[key] ?? null;
+  let variation = null;
+  let attempts = 0;
+
+  do {
+    let randomIndex = Math.floor(Math.random() * matchingFiles.length);
+    let fileName = matchingFiles[randomIndex].split("/").pop();
+    variation = fileName.replace(basePattern, "").replace(".ogg", "");
+    attempts++;
+  } while (variation === lastUsed && attempts < 10);
+
+  game.combatNarrationCache[key] = variation;
+
+  const filePath = `${folderPath}${key}_${variation}.ogg`;
+  narrateLog(`🔊 Playing audio: ${filePath}`);
+
+  // ✅ THIS IS ALL YOU NEED
+  await AudioHelper.play(
+    { src: filePath, volume: 1.0, autoplay: true, loop: false },
+    true
+  );
+}
+
+
+
+
 
 Hooks.on("midi-qol.RollComplete", async (workflow) => {
     narrateLog("🗡️ Combat Narration Hook Triggered");
@@ -257,33 +300,7 @@ for (const [formula, type] of fallbackParts) {
     else{
       key = `${weaponType}_success`;
     }
-    
-    const basePattern = `${key}_`;
-    const files = await FilePicker.browse("data", folderPath);
-    const matchingFiles = files.files.filter(f => {
-      const fileName = f.split("/").pop();
-      return fileName.startsWith(basePattern) && fileName.endsWith(".ogg");
-    });
-
-    narrateLog(`🎯 Found ${matchingFiles.length} miss files for ${weaponType}.`);
-
-    if (matchingFiles.length > 0) {
-      const lastUsed = game.combatNarrationCache[key] || null;
-      let attempts = 0;
-      do {
-        const randomIndex = Math.floor(Math.random() * matchingFiles.length);
-        const fileName = matchingFiles[randomIndex].split("/").pop();
-        variation = fileName.replace(basePattern, "").replace(".ogg", "");
-        attempts++;
-      } while (variation === lastUsed && attempts < 10);
-
-      game.combatNarrationCache[key] = variation;
-      const filePath = `${folderPath}${key}_${variation}.ogg`;
-      narrateLog(`🔊 Playing miss audio: ${filePath}`);
-      AudioHelper.play({ src: filePath, volume: 1.0, autoplay: true, loop: false }, true);
-    } else {
-      console.warn("⚠️ No matching miss audio files found.");
-    }
+    await playAudio(key);
 
     return;
   }
@@ -292,9 +309,9 @@ for (const [formula, type] of fallbackParts) {
   const target = hitTargets[0];
   const targetMaxHP = target.actor.system.attributes.hp.max + target.actor.system.attributes.hp.temp;
   const targetHP = target.actor.system.attributes.hp.value + target.actor.system.attributes.hp.temp;
-  narrateLog(`📌 Actor: ${actor.name}, Immunities: ${[...target.actor.system.traits.di.value]}`);
-  narrateLog(`📌 Actor: ${actor.name}, Vulnerabilties: ${[...target.actor.system.traits.dv.value]}`);
-  narrateLog(`📌 Actor: ${actor.name}, Resistances: ${[...target.actor.system.traits.dr.value]}`);
+  narrateLog(`📌 Target Immunities: ${[...target.actor.system.traits.di.value]}`);
+  narrateLog(`📌 Target Vulnerabilties: ${[...target.actor.system.traits.dv.value]}`);
+  narrateLog(`📌 Target Resistances: ${[...target.actor.system.traits.dr.value]}`);
 
   const isImmune = [...target.actor.system.traits.di.value].includes(weaponType);
   const isVulnerable = [...target.actor.system.traits.dv.value].includes(weaponType);
@@ -340,7 +357,6 @@ for (const [formula, type] of fallbackParts) {
 
   //Monster specific hit handling
   //only run if target is not immune
-
   if(!isImmune){
     const targetNameLower = target.name.toLowerCase();
   
@@ -369,34 +385,67 @@ for (const [formula, type] of fallbackParts) {
     }
   }
   
-  narrateLog(`🔥 filename key: ${key}`);
-  
-  let variation = "001";
 
-  const basePattern = `${key}_`;
-  const files = await FilePicker.browse("data", folderPath);
-  const matchingFiles = files.files.filter(f => {
-    const fileName = f.split("/").pop();
-    return fileName.startsWith(basePattern) && fileName.endsWith(".ogg");
-  });
-
-  narrateLog(`🎧 Found ${matchingFiles.length} hit files.`);
-
-  if (matchingFiles.length > 0) {
-    const lastUsed = game.combatNarrationCache[key] || null;
-    let attempts = 0;
-    do {
-      const randomIndex = Math.floor(Math.random() * matchingFiles.length);
-      const fileName = matchingFiles[randomIndex].split("/").pop();
-      variation = fileName.replace(basePattern, "").replace(".ogg", "");
-      attempts++;
-    } while (variation === lastUsed && attempts < 10);
-
-    game.combatNarrationCache[key] = variation;
-    const filePath = `${folderPath}${key}_${variation}.ogg`;
-    narrateLog(`🔊 Playing hit audio: ${filePath}`);
-    AudioHelper.play({ src: filePath, volume: 1.0, autoplay: true, loop: false }, true);
-  } else {
-    console.warn("⚠️ No matching hit audio files found.");
+  //condition specific handling
+  const SUPPORTED_CONDITIONS = new Set([
+    "blinded",
+    "charmed",
+    "deafened",
+    "grappled",
+    "incapacitated",
+    "invisible",
+    "paralyzed",
+    "petrified",
+    "poisoned",
+    "prone",
+    "restrained",
+    "stunned",
+    "exhausted"
+  ]);
+  const appliedConditions = new Set();
+  // 1️⃣ Conditions defined on the item itself
+  for (const e of workflow.item?.effects ?? []) {
+    for (const status of e.statuses ?? []) {
+      appliedConditions.add(status);
+    }
   }
+  // 2️⃣ Conditions actually present on failed-save targets
+  for (const t of workflow.failedSaves ?? []) {
+    for (const status of t.actor?.statuses ?? []) {
+      appliedConditions.add(status);
+    }
+  }
+  const conditions = [...appliedConditions];
+  const matchedConditions = conditions.filter(c =>
+    SUPPORTED_CONDITIONS.has(c)
+  );
+
+  
+
+  narrateLog(`🔥 Conditions: ${conditions}`);
+  narrateLog(`🔥 Matched Conditions: ${matchedConditions}`);
+  narrateLog(`🔥 First Matched Conditions: ${matchedConditions.at(0)}`);
+
+  if(matchedConditions.length == 0 || conditions.includes("dead")){
+    narrateLog(`🔥 filename key: ${key}`);
+    await playAudio(key);
+  }
+  else{
+    narrateLog(`🔥 Playing condition key: ${matchedConditions.at(0)}`);
+    await playAudio(matchedConditions.at(0));
+  }
+
+  
+
+
+
+    
+  
+  
+  
+
+
+
 });
+
+

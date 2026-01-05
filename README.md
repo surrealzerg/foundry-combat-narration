@@ -1,8 +1,11 @@
 Install with module.json:
 https://github.com/surrealzerg/foundry-combat-narration/releases/download/v1.1/module.json
 
+2026-01-04 Added support for conditions (3 lines each). Audio for first matched condition is played unless target is dead.
+	Supported conditions - blinded,charmed,deafened,grappled,incapacitated,invisible,paralyzed,petrified,poisoned,prone,restrained,stunned,exhausted
+	
 This module plays narration when damage is dealt.
-As of 1/1/2026 there are 883 dialogue lines in the library.
+As of 1/4/2026 there are 922 dialogue lines in the library.
 
 Demo:
 https://github.com/surrealzerg/foundry-combat-narration/raw/refs/heads/main/combat-narration.webm
