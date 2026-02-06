@@ -375,8 +375,8 @@ for (const [formula, type] of fallbackParts) {
     }
 
     if(monsterSpecific != null){
-      //even if monster specific found, only use monster specific key 50% of the time
-      if (Math.random() < .5) {
+      //even if monster specific found, only use monster specific key 85% of the time
+      if (Math.random() < .85) {
         key = monsterSpecific;
       }
       else{
